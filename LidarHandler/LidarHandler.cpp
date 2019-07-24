@@ -42,13 +42,13 @@ int main()
 
 void ProcessFrame(std::vector<DataPoint> frame, int& cycle_counter, int& frame_counter)
 {
-	// Create filestream for CSV output
-	ofstream outputFile;
-	// create a name for the file output
-	string filename = "exampleOutput" + to_string(frame_counter) + ".csv";
-	// create and open the .csv file
-	outputFile.open(filename);
-	outputFile << "x,y,z" << endl;
+	//// Create filestream for CSV output
+	//ofstream outputFile;
+	//// create a name for the file output
+	//string filename = "exampleOutput" + to_string(frame_counter) + ".csv";
+	//// create and open the .csv file
+	//outputFile.open(filename);
+	//outputFile << "x,y,z" << endl;
 
 	// Iterate over every point in the frame
 	for (DataPoint& laser : frame)
@@ -60,8 +60,9 @@ void ProcessFrame(std::vector<DataPoint> frame, int& cycle_counter, int& frame_c
 
 		DisplayDistance(laser.azimuth, laser.id, cycle_counter, laser.distance);
 	}
-	outputFile.close();
-	frame_counter++;
+
+	/*outputFile.close();
+	frame_counter++;*/
 }
 
 void ColorByDistance(DataPoint& dataPoint)
