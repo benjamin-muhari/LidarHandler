@@ -28,9 +28,10 @@ int main()
 			continue;
 		}
 
+		// stop program after 2 frames (for writing to CSV)
 		if (frame_counter == 2) { break; }
 
-		ColorPoints(dataPoints);
+		//ColorPoints(dataPoints);
 		WriteToCSV(dataPoints, frame_counter);
 		//DisplayDistance(dataPoints,cycle_counter);
 	}
@@ -44,6 +45,40 @@ void ColorPoints(std::vector<DataPoint>& frame)
 	//ColorByLaser(frame);
 	//ColorByDistance(frame);
 	//ColorByObjects(frame);
+	//ColorBy4Diff(frame);
+}
+
+void ColorBy4Diff(std::vector<DataPoint>& frame)
+{
+	int color_code = 0;
+	double last_azimuth = 0;
+	int last_id = 0;
+	
+	for (DataPoint& laser : frame)
+	{
+		if (laser.azimuth > last_azimuth)
+		{
+			color_code = 0;
+		}
+		else if (laser.id < last_id)
+		{
+			color_code++;
+		}
+		Coordinates zerocords;
+		laser.color = color_code;
+
+		last_azimuth = laser.azimuth;
+		last_id = laser.id;
+
+		// Hide some colors for testing
+		//if (laser.color == 2 || laser.color == 3)
+		//{
+		//	laser.coordinates.x = 0;
+		//	laser.coordinates.y = 0;
+		//	laser.coordinates.z = 0;
+		//	laser.distance = 0;
+		//}
+	}
 }
 
 void ColorByObjects(std::vector<DataPoint>& frame)
@@ -102,16 +137,22 @@ void WriteToCSV(const std::vector<DataPoint>& frame, int& frame_counter)
 	string filename = "frame" + to_string(frame_counter) + ".csv";
 	// create and open the .csv file
 	outputFile.open(filename);
-	outputFile << "x,y,z,dist,color" << endl;
+	outputFile << "x,y,z,dist,id,az,color" << endl;
 
 	// Iterate over every point in the frame
 	for (const DataPoint& laser : frame)
 	{
-		outputFile << to_string(laser.coordinates.x) << ","
-			<< to_string(laser.coordinates.y) << ","
-			<< to_string(laser.coordinates.z) << ","
-			<< to_string(laser.distance) << ","
-			<< to_string(laser.color) << endl;
+		if (true)
+		//if (laser.distance != 0)
+		{
+			outputFile << to_string(laser.coordinates.x) << ","
+				<< to_string(laser.coordinates.y) << ","
+				<< to_string(laser.coordinates.z) << ","
+				<< to_string(laser.distance) << ","
+				<< to_string(laser.id) << ","
+				<< to_string(laser.azimuth) << ","
+				<< to_string(laser.color) << endl;
+		}
 	}
 
 	outputFile.close();
@@ -122,12 +163,23 @@ void DisplayDistance(const std::vector<DataPoint>& frame, int& cycle_counter)
 {
 	for (const DataPoint& laser : frame)
 	{
+		//cout << laser.distance;
+		//if (cycle_counter > 9)
+		//{
+		//	cout << laser.distance << endl;
+		//	cycle_counter = 0;
+		//	break;
+		//}
+		//cycle_counter++;
+		//break;
+		
+		
 		if (laser.azimuth < 1 && laser.azimuth > 0 && (laser.id == 0 || laser.id == 7 || laser.id == 15))
 		{
 			if (laser.id == 0) { cycle_counter++; }
 
 			//if (true)
-			if (cycle_counter > 100)
+			if (cycle_counter > 50)
 			{
 				cout << " distance: " << laser.distance << " (" << static_cast<int>(laser.id) << ")";
 				if (laser.id == 15)
@@ -139,9 +191,3 @@ void DisplayDistance(const std::vector<DataPoint>& frame, int& cycle_counter)
 		}
 	}
 }
-	//TODO
-
-	//object detection on frames
-	//	similar vert+azimuth but distance over threshold
-	//		how large of an environment
-	//		structure of closest points
