@@ -31,7 +31,7 @@ int main()
 		// stop program after 2 frames (for writing to CSV)
 		if (frame_counter == 2) { break; }
 
-		//ColorPoints(dataPoints);
+		ColorPoints(dataPoints);
 		WriteToCSV(dataPoints, frame_counter);
 		//DisplayDistance(dataPoints,cycle_counter);
 	}
@@ -44,8 +44,9 @@ void ColorPoints(std::vector<DataPoint>& frame)
 	//ColorInOrder(frame,4000,1.5);
 	//ColorByLaser(frame);
 	//ColorByDistance(frame);
-	//ColorByObjects(frame);
 	//ColorBy4Diff(frame);
+
+	ColorByObjects(frame);
 }
 
 void ColorBy4Diff(std::vector<DataPoint>& frame)
@@ -64,43 +65,65 @@ void ColorBy4Diff(std::vector<DataPoint>& frame)
 		{
 			color_code++;
 		}
-		Coordinates zerocords;
-		laser.color = color_code;
 
+		laser.color = color_code;
 		last_azimuth = laser.azimuth;
 		last_id = laser.id;
 
-		// Hide some colors for testing
-		//if (laser.color == 2 || laser.color == 3)
-		//{
-		//	laser.coordinates.x = 0;
-		//	laser.coordinates.y = 0;
-		//	laser.coordinates.z = 0;
-		//	laser.distance = 0;
-		//}
+		//HideLaser(laser)
 	}
+}
+
+bool HideLaser(DataPoint& laser, const bool condition)
+{
+	if (condition)
+	{
+		laser.coordinates.x = 0;
+		laser.coordinates.y = 0;
+		laser.coordinates.z = 0;
+		laser.distance = 0;
+
+		return true;
+	}
+	else
+		return false;
 }
 
 void ColorByObjects(std::vector<DataPoint>& frame)
 {
-	for (DataPoint& laser : frame)
+	float distance_threshold = 100;
+	float last_distance[16];
+	int color_code[16];
+
+	for (int i = 0; i < 16; i++)
 	{
+		last_distance[i] = 0;
+		color_code[i] = 0;
+	}
+
+	int step = 0;
+
+	for (DataPoint& laser : frame)
+	{	
+		// Hide every laser but 7th for testing
+		if (HideLaser(laser, laser.id != 7))
+			continue;
 		
+		if (std::abs(laser.distance - last_distance[laser.id]) > distance_threshold)
+		{
+			color_code[laser.id] = (color_code[laser.id] + 1) % 2;
+		}
+
+		laser.color = color_code[laser.id];
+		last_distance[laser.id] = laser.distance;
 	}
 }
 
 void ColorByDistance(std::vector<DataPoint>& frame)
 {
-	std::sort(frame.begin(), frame.end(),compareLaserDistance);
+	std::sort(frame.begin(), frame.end(), DataPoint::compareDistance);
 	ColorInOrder(frame, 4000, 1.5);
 }
-
-// Comparison function for std::sort, by distance
-bool compareLaserDistance(const DataPoint& a, const DataPoint& b)
-{
-	return a.distance < b.distance;
-}
-
 
 void ColorByLaser(std::vector<DataPoint>& frame)
 {
@@ -142,8 +165,8 @@ void WriteToCSV(const std::vector<DataPoint>& frame, int& frame_counter)
 	// Iterate over every point in the frame
 	for (const DataPoint& laser : frame)
 	{
-		if (true)
-		//if (laser.distance != 0)
+		//if (true)
+		if (laser.distance != 0)
 		{
 			outputFile << to_string(laser.coordinates.x) << ","
 				<< to_string(laser.coordinates.y) << ","
@@ -163,6 +186,8 @@ void DisplayDistance(const std::vector<DataPoint>& frame, int& cycle_counter)
 {
 	for (const DataPoint& laser : frame)
 	{
+
+		// 1 point from every 10th frame
 		//cout << laser.distance;
 		//if (cycle_counter > 9)
 		//{

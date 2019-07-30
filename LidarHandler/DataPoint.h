@@ -19,4 +19,10 @@ struct DataPoint
 			return azimuth < laser.azimuth;
 		}
 	}
+	
+	// Comparison function for std::sort, by distance
+	static bool compareDistance(const DataPoint& a, const DataPoint& b)
+	{
+		return a.distance < b.distance;
+	}
 };
