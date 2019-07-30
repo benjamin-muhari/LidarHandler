@@ -42,11 +42,10 @@ int main()
 void ColorPoints(std::vector<DataPoint>& frame)
 {
 	//ColorInOrder(frame,4000,1.5);
-	//ColorByLaser(frame);
+	ColorByLaser(frame);
 	//ColorByDistance(frame);
 	//ColorBy4Diff(frame);
-
-	ColorByObjects(frame);
+	//ColorByObjects(frame);
 }
 
 void ColorBy4Diff(std::vector<DataPoint>& frame)

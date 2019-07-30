@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="LidarHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,17 +32,14 @@
     <ClInclude Include="DataPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VLP16Capture.h">
+    <ClInclude Include="LidarHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LidarHandler.h">
+    <ClInclude Include="VLP16Capture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\todo.txt" />
   </ItemGroup>
 </Project>
