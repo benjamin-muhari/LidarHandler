@@ -24,12 +24,18 @@ int main()
 		// Capture One Rotation Laser Data (one frame)
 		std::vector<DataPoint> dataPoints;
 		capture.retrieve(dataPoints);
+		
 		if (dataPoints.empty()) {
 			continue;
 		}
 
 		// stop program after 2 frames (for writing to CSV)
-		if (frame_counter == 2) { break; }
+		//if (frame_counter == 2) { break; }
+
+		// testing
+		//cout << dataPoints.size() << endl;
+		//continue;
+
 
 		ColorPoints(dataPoints);
 		WriteToCSV(dataPoints, frame_counter);
@@ -37,6 +43,12 @@ int main()
 	}
 
 	return 0;
+}
+
+void CallMain()
+{
+	main();
+	cout << "End of C++ program" << endl;
 }
 
 void ColorPoints(std::vector<DataPoint>& frame)

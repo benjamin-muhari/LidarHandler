@@ -9,7 +9,14 @@
 #include <iomanip>
 #include <sstream>
 
+#ifndef DATAPOINT_H
+#define DATAPOINT_H
 #include "DataPoint.h"
+#endif
+#include "Python.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 
 
 class VelodyneVLP16PCAP
@@ -77,8 +84,14 @@ public:
 
 	~VelodyneVLP16PCAP();
 
+	// Export frame to Python program
+	std::vector<std::vector<float>> export_frame();
+
+	//
+	pybind11::handle export_frame_pyobj();
+
 	// Open live stream
-	const bool open_live();
+	const bool open_live(const int channelID = 0);
 
 	// Open the file
 	const bool open(const std::string& filename); 
@@ -95,10 +108,12 @@ public:
 	// Retrieve Captured Data
 	void retrieve(std::vector<DataPoint>& lasers);
 
+	//TODO DELETE TEST
+	bool first = true;
+
 private:
 	void readPCAP();
 
 	void parseDataPacket(const DataPacket* packet, std::vector<DataPoint>& lasers, double& last_azimuth);
-
 
 };

@@ -1,3 +1,12 @@
+//#include <vector>
+#ifndef DATAPOINT_H
+#define DATAPOINT_H
+#include "DataPoint.h"
+#endif
+
+// Exported func. to python, just to run the original cpp program
+void CallMain();
+
 // Display distance values of some lasers for testing
 void DisplayDistance(const std::vector<DataPoint>& frame, int& cycle_counter);
 

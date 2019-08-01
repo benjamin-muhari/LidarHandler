@@ -13,7 +13,8 @@
 #include <iostream>
 
 #include "VLP16Capture.h"
-//
+
+
 using namespace std;
 
 VelodyneVLP16PCAP::VelodyneVLP16PCAP()
@@ -25,7 +26,63 @@ VelodyneVLP16PCAP::~VelodyneVLP16PCAP()
 	close();
 }
 
-const bool VelodyneVLP16PCAP::open_live()
+pybind11::handle VelodyneVLP16PCAP::export_frame_pyobj()
+{
+	//PyObject* pyfloat = PyFloat_FromDouble(2.5);
+	//pybind11::handle ret = pyfloat;
+	//return ret;
+
+	std::vector<DataPoint> dataPoints;
+	while (this->isRun())
+	{
+		this->retrieve(dataPoints);
+
+		if (dataPoints.empty() || dataPoints.size() == 0) { continue; }
+		else { break; }
+	}
+
+	PyObject* frame_as_list = PyList_New(0);
+
+	for (const DataPoint& laser : dataPoints)
+	{
+		PyObject* one_point = PyList_New(0);
+		PyList_Append(one_point, PyFloat_FromDouble(laser.coordinates.x));
+		PyList_Append(one_point, PyFloat_FromDouble(laser.coordinates.y));
+		PyList_Append(one_point, PyFloat_FromDouble(laser.coordinates.z));
+
+		PyList_Append(frame_as_list, one_point);
+	}
+
+	pybind11::handle ret = frame_as_list;
+	return ret;
+}
+
+std::vector<std::vector<float>> VelodyneVLP16PCAP::export_frame()
+{
+	std::vector<DataPoint> dataPoints;
+	while (this->isRun())
+	{
+		this->retrieve(dataPoints);
+
+		if (dataPoints.empty() || dataPoints.size() == 0) { continue; }
+		else { break; }
+	}
+	std::vector<std::vector<float>> frame_as_2D_vector = std::vector<std::vector<float>>();
+
+	for (const DataPoint& laser : dataPoints)
+	{
+		std::vector<float> xyz = std::vector<float>();
+		xyz.push_back(laser.coordinates.x);
+		xyz.push_back(laser.coordinates.y);
+		xyz.push_back(laser.coordinates.z);
+
+		frame_as_2D_vector.push_back(xyz);
+	}
+	//std::cout << "called read_frame() vector size: " << frame_as_2D_vector.size() << std::endl;
+	return frame_as_2D_vector;
+}
+
+const bool VelodyneVLP16PCAP::open_live(const int channelID)
 {
 	pcap_if_t* alldevs;
 	pcap_if_t* d;
@@ -41,24 +98,33 @@ const bool VelodyneVLP16PCAP::open_live()
 		exit(1);
 	}
 
-	/* Print the list */
-	for (d = alldevs; d; d = d->next)
+	//List available channels if none is specified in channelID
+	if (channelID == 0)
 	{
-		printf("%d. %s", ++i, d->name);
-		if (d->description)
-			printf(" (%s)\n", d->description);
-		else
-			printf(" (No description available)\n");
-	}
+		for (d = alldevs; d; d = d->next)
+		{
+			printf("%d. %s", ++i, d->name);
+			if (d->description)
+				printf(" (%s)\n", d->description);
+			else
+				printf(" (No description available)\n");
+		}
 
-	if (i == 0)
+		if (i == 0)
+		{
+			printf("\nNo interfaces found! Make sure WinPcap is installed.\n");
+			return -1;
+		}
+
+		printf("Enter the interface number (1-%d):", i);
+		scanf_s("%d", &inum);
+	}
+	else
 	{
-		printf("\nNo interfaces found! Make sure WinPcap is installed.\n");
-		return -1;
+		inum = channelID;
+		for (d = alldevs; d; d = d->next)
+			i++;
 	}
-
-	printf("Enter the interface number (1-%d):", i);
-	scanf_s("%d", &inum);
 
 	if (inum < 1 || inum > i)
 	{
@@ -193,13 +259,11 @@ void VelodyneVLP16PCAP::close()
 void VelodyneVLP16PCAP::retrieve(std::vector<DataPoint> & lasers)
 {
 	// Pop One Rotation Data from Queue
-	if (mutex.try_lock()) {
-		if (!queue.empty()) {
-			lasers = std::move(queue.front());
-			queue.pop();
-		}
-		mutex.unlock();
-	}
+	while (queue.empty() || !mutex.try_lock()) {}
+
+	lasers = std::move(queue.front());
+	queue.pop();
+	mutex.unlock();
 }
 
 void VelodyneVLP16PCAP::readPCAP()
@@ -263,6 +327,13 @@ void VelodyneVLP16PCAP::parseDataPacket(const DataPacket * packet, std::vector<D
 
 			azimuth += azimuth_delta * laser_relative_time / time_total_cycle;
 
+			// TODO DELETE, only for testing
+			if (first)
+			{
+				first = false;
+				cout<<endl<<"First azimuth: "<<azimuth<<endl;
+			}
+
 			// Reset Rotation Azimuth if it rolled over 360
 			if (azimuth >= 36000)
 			{
@@ -273,6 +344,10 @@ void VelodyneVLP16PCAP::parseDataPacket(const DataPacket * packet, std::vector<D
 			if (last_azimuth > azimuth) {
 				// Push One Rotation Data to Queue
 				mutex.lock();
+				if (queue.size() >= 1)
+				{
+					queue.pop();
+				}
 				queue.push(std::move(lasers));
 				mutex.unlock();
 				lasers.clear();
