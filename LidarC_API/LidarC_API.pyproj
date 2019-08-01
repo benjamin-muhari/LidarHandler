@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>c7aba020-af2f-4b7f-bf45-92c4f3ce0288</ProjectGuid>
+    <ProjectGuid>c8f7d078-910c-4693-8fbd-5627315b04c9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>LidarPCV.py</StartupFile>
+    <StartupFile>LidarC_API.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>LidarPCV</Name>
-    <RootNamespace>LidarPCV</RootNamespace>
+    <Name>LidarC_API</Name>
+    <RootNamespace>LidarC_API</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="LidarPCV.py" />
+    <Compile Include="LidarC_API.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LidarHandler\LidarHandler.vcxproj">

@@ -1,5 +1,5 @@
-#define PYBIND
-#ifndef PYBIND
+//#define PYAPI
+#ifdef PYAPI
 // dont't compile this if pybind is being used
 
 #include <Python.h>

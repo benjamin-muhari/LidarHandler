@@ -1,54 +1,28 @@
 #----------------------------------------------------------------------------
-#-- C-Api -------------------------------------------------------------------
+from LidarHandler import run_cpp_program
+
+try:
+    run_cpp_program()
+except:
+    print("c-api\n")
+    run_cpp_program("dummy")
 #----------------------------------------------------------------------------
-#import loadCompare as lc
+#from LidarHandler import VeloParser
+#import time
 
-#lc.CompareLoadTimes()
+#vp = VeloParser()
+#vp.open_live(4)
 
-#----------------------------------------------------------------------------
-#from LidarHandler import run_cpp_program
+#start = time.time()
+#for i in range(10):
+#    print(vp.read_frame_vector()[0])
+#end = time.time()
+#autoconv_time = end - start
 
-#try:
-#    run_cpp_program()
-#except:
-#    print("C-API\n")
-#    run_cpp_program("dummy")
-#----------------------------------------------------------------------------
-from LidarHandler import VeloParser
-import time
+#start = time.time()
+#for i in range(100):
+#    print(len(vp.read_frame_pyobj()))
+#end = time.time()
 
-vp = VeloParser()
-vp.open_live(4)
-
-start = time.time()
-for i in range(10):
-    print(vp.read_frame_vector()[0])
-end = time.time()
-autoconv_time = end - start
-
-print("-------------------------------------")
-
-start = time.time()
-for i in range(1000):
-    print(vp.read_frame_pyobj()[0])
-end = time.time()
-
-print("Retreive auto converted list: ", autoconv_time)
-print("Retreive manualy built list:", end - start)
-
-
-#----------------------------------------------------------------------------
-#-- Pybind ------------------------------------------------------------------
-#----------------------------------------------------------------------------
-#from LidarHandler import hw
-#from LidarHandler import MyCord
-##hw()
-#a = MyCord()
-#print(a.getX())
-#a.setXY(2,3)
-#print(a.getX())
-
-#print(a.readIntQueue())
-
-#for cord in a.readCordQueue():
-#    print(cord)
+#print("Retreive auto converted list: ", autoconv_time)
+#print("Retreive manualy built list:", end - start)

@@ -33,8 +33,8 @@ int main()
 		//if (frame_counter == 2) { break; }
 
 		// testing
-		//cout << dataPoints.size() << endl;
-		//continue;
+		cout << dataPoints.size() << endl;
+		continue;
 
 
 		ColorPoints(dataPoints);
