@@ -105,7 +105,7 @@ void ColorByObjects(std::vector<DataPoint>& frame)
 	float distance_threshold = 100;
 	float last_distance[16];
 	int color_code[16];
-
+	//
 	for (int i = 0; i < 16; i++)
 	{
 		last_distance[i] = 0;
